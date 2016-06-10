@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MapDemo2</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_maps_activity_visitor">Map</string>
+    <string name="title_activity_admin_action">AdminActionActivity</string>
+</resources>
