@@ -1,7 +1,15 @@
 <resources>
-    <string name="app_name">MapDemo2</string>
+    <string name="app_name">findKH</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_maps_activity_visitor">Map</string>
     <string name="title_activity_admin_action">AdminActionActivity</string>
+
+    <string-array name="event_type">
+        <item>Sportif</item>
+        <item>Educationel</item>
+        <item>Music</item>
+    </string-array>
+
+
 </resources>

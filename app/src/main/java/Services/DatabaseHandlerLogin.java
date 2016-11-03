@@ -9,12 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.Point;
 import Models.User;
 
-/**
- * Created by Ayoub on 5/6/2016.
- */
+
 public class DatabaseHandlerLogin extends SQLiteOpenHelper
 {
     private static final int DATABASE_VERSION = 1;
@@ -39,8 +36,13 @@ public class DatabaseHandlerLogin extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        String CREATE_TABLE = "CREATE TABLE " + TABLE + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USERNAME + " TEXT," + KEY_PASSWORD +" TEXT)";
+        String CREATE_TABLE =
+                "CREATE TABLE " + TABLE +
+                        "("
+                            + KEY_ID + " INTEGER PRIMARY KEY,"
+                            + KEY_USERNAME + " TEXT,"
+                            + KEY_PASSWORD +" TEXT" +
+                        ")";
 
         db.execSQL(CREATE_TABLE);
 
@@ -141,9 +143,5 @@ public class DatabaseHandlerLogin extends SQLiteOpenHelper
         return null;
     }
 
-    public void deleteTestMarkers()
-    {
-        SQLiteDatabase db = this.getReadableDatabase();
-        db.execSQL("DELETE FROM "+TABLE+" WHERE myValue LIKE 'New Marker%");
-    }
+
 }

@@ -7,10 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import Models.Point;
+import Models.EventType;
+import Models.Marker;
 
 /**
  * Created by Ayoub on 5/6/2016.
@@ -23,13 +23,18 @@ public class DatabaseHandlerMarkers extends SQLiteOpenHelper
     private static final String DATABASE_NAME = "KhouribgaTourism";
 
     // Contacts table name
-    private static final String TABLE = "Events";
+    private static final String TABLE = "Evenements";
 
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
-    private static final String KEY_X = "x";
-    private static final String KEY_Y = "y";
+    private static final String KEY_LAT = "latitude";
+    private static final String KEY_LOG = "longitude";
+    private static final String KEY_EventType = "eventType";
+    private static final String KEY_EventDESC = "eventDesc";
+
+
+    private SQLiteDatabase db;
 
     public DatabaseHandlerMarkers(Context context)
     {
@@ -39,11 +44,17 @@ public class DatabaseHandlerMarkers extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        String CREATE_TABLE = "CREATE TABLE " + TABLE + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_X +" NUMERIC(16,16)," +  KEY_Y +" NUMERIC(16,16))";
+        String CREATE_TABLE = "CREATE TABLE " + TABLE +
+                "("
+                + KEY_ID + " INTEGER PRIMARY KEY,"
+                + KEY_NAME + " TEXT,"
+                + KEY_LAT +" NUMERIC(16,16),"
+                + KEY_LOG +" NUMERIC(16,16), "
+                + KEY_EventType + " TEXT, "
+                +KEY_EventDESC+" TEXT"
+                + ")";
 
         db.execSQL(CREATE_TABLE);
-
     }
 
     @Override
@@ -57,44 +68,59 @@ public class DatabaseHandlerMarkers extends SQLiteOpenHelper
 
     }
 
-    public void addrow(String name,double x,double y)
+    public void addrow(String name,double lat,double log, EventType eventType,String desc)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
         values.put(KEY_NAME, name);
-        values.put(KEY_X, x);
-        values.put(KEY_Y, y);
+        values.put(KEY_EventDESC, desc);
+        values.put(KEY_LAT, lat);
+        values.put(KEY_LOG, log);
+        values.put(KEY_EventType, eventType.toString());
 
         // Inserting Row
         db.insert(TABLE, null, values);
         db.close();
     }
 
-    public int updaterow(String id,String name)
+    public void addMarker(Marker m)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+
+        values.put(KEY_NAME, m.getEvent());
+        values.put(KEY_LAT, m.getLat());
+        values.put(KEY_LOG, m.getLog());
+        values.put(KEY_EventType, m.getEventType().toString());
+        values.put(KEY_EventDESC, m.getDesc());
+
+        // Inserting Row
+        db.insert(TABLE, null, values);
+        db.close();
+    }
+
+    public int updaterow(String oldName,String newName)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NAME, name);
+        values.put(KEY_NAME, newName);
 
 
         // updating row
-        return db.update(TABLE, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(id) });
+        return db.update(TABLE, values, KEY_NAME + " = ?",
+                new String[] { String.valueOf(oldName) });
     }
 
-    public List<Point> getAllCoords()
+    public List<Marker> getAllCoords()
     {
-        /*
-        HashMap<String,HashMap<Double,Double>> coords = new HashMap<>();
-        HashMap<Double,Double> tempCoord;
-        */
 
-        List<Point> listPoints = new ArrayList<>();
-        Point p;
+        List<Marker> listMarkers = new ArrayList<>();
+        Marker p;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor  cursor = db.rawQuery("select * from " + TABLE, null);
@@ -105,33 +131,65 @@ public class DatabaseHandlerMarkers extends SQLiteOpenHelper
             while (cursor.isAfterLast() == false)
             {
                 String event = cursor.getString(cursor.getColumnIndex(KEY_NAME));
-                Double x = cursor.getDouble(cursor.getColumnIndex(KEY_X));
-                Double y = cursor.getDouble(cursor.getColumnIndex(KEY_Y));
+                String desc = cursor.getString(cursor.getColumnIndex(KEY_EventDESC));
+                Double lat = cursor.getDouble(cursor.getColumnIndex(KEY_LAT));
+                Double log = cursor.getDouble(cursor.getColumnIndex(KEY_LOG));
+                String type = cursor.getString(cursor.getColumnIndex(KEY_EventType));
 
-                p = new Point(event,x,y);
+                EventType typeevent = EventType.valueOf(type);
 
-                listPoints.add(p);
-                /*
-                tempCoord = new HashMap<>();
+                p = new Marker(event,typeevent,desc,lat,log);
 
-                tempCoord.put(x,y);
-                coords.put(event,tempCoord);
-                */
-
+                listMarkers.add(p);
 
                 cursor.moveToNext();
             }
         }
 
-        return listPoints;
+        return listMarkers;
     }
+
+    public List<Marker> getAllCoordsByEvent(String term)
+    {
+
+        List<Marker> listMarkers = new ArrayList<>();
+        Marker p;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor  cursor = db.rawQuery("select * from " + TABLE +" WHERE "+KEY_NAME+"='"+term+"'", null);
+
+        if (cursor .moveToFirst())
+        {
+
+            while (cursor.isAfterLast() == false)
+            {
+                String event = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+                Double lat = cursor.getDouble(cursor.getColumnIndex(KEY_LAT));
+                Double log = cursor.getDouble(cursor.getColumnIndex(KEY_LOG));
+                String type = cursor.getString(cursor.getColumnIndex(KEY_EventType));
+                String desc = cursor.getString(cursor.getColumnIndex(KEY_EventDESC));
+
+                EventType typeEvent = EventType.valueOf(type);
+
+                p = new Marker(event,typeEvent,desc,lat,log);
+
+
+                listMarkers.add(p);
+
+                cursor.moveToNext();
+            }
+        }
+
+        return listMarkers;
+    }
+
 
     // Getting single name
     public String getrow(int id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE, new String[]{KEY_ID, KEY_NAME, KEY_X, KEY_Y}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
+        Cursor cursor = db.query(TABLE, new String[]{KEY_ID, KEY_NAME, KEY_LAT, KEY_LOG}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
 
         if (cursor != null)
             cursor.moveToFirst();
@@ -141,6 +199,15 @@ public class DatabaseHandlerMarkers extends SQLiteOpenHelper
 
     public void deleteTestMarkers()
     {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM "+TABLE+" WHERE "+KEY_NAME+" LIKE 'tm%");
+
+    }
+
+    public void deleteMarkersByName(String marker)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DELETE FROM "+TABLE+" WHERE "+KEY_NAME+"='"+marker+"'");
 
     }
 }

@@ -15,12 +15,26 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/textView"
+        <TextView android:id="@+id/txtHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome"
-            android:layout_gravity="center"/>
+            android:gravity="center_vertical"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:textColor="#FFFFFF"
+            android:padding="10dp"
+            android:text="Bienvenu à : findKH "
+            android:background="#336699"
+            android:layout_gravity="top"
+            android:textAlignment="center"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ensakhouribga"
+            android:layout_gravity="center"
+            />
 
         <Button
             android:layout_width="match_parent"
@@ -35,9 +49,6 @@
             android:id="@+id/admin"
             android:text="Admin"
             android:layout_gravity="center"/>
-
-
-
 
     </LinearLayout>
 

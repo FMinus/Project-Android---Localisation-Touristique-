@@ -57,7 +57,7 @@ public class MainActivity extends Activity
 
     public void toVisitorMap()
     {
-        Intent intent = new Intent(this, MapsActivityVisitor.class);
+        Intent intent = new Intent(getApplicationContext(), MapsActivityVisitor.class);
         startActivity(intent);
     }
 }
